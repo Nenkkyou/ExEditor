@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Aplicativo de Edição de Excel</title>
+    <title>Aplicativo de Edição de Excel - Avançado</title>
     <!-- Estilos -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,101 +13,141 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
         #container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 20px;
             background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
         h1 {
             text-align: center;
-            font-weight: 500;
-            margin-bottom: 20px;
+            font-weight: 700;
+            margin-bottom: 30px;
             color: #007BFF;
+            text-transform: uppercase;
+        }
+        #fileInputContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #fileInputLabel {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
         }
         #fileInput {
-            margin-bottom: 20px;
-            display: block;
-            margin: 0 auto;
+            padding: 15px;
+            border: 2px dashed #007BFF;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+            background-color: #fafafa;
+        }
+        #fileInput:hover {
+            border-color: #0056b3;
+            background-color: #f0f8ff;
         }
         #tableContainer {
             overflow-x: auto;
             margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         table {
             width: 100%;
             border-collapse: collapse;
             color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 15px;
             text-align: left;
+            transition: background-color 0.3s, color 0.3s;
         }
         th {
             background-color: #007BFF;
             color: #ffffff;
             contenteditable: true;
+            transition: background-color 0.3s;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e9ecef;
         }
         #searchInput {
-            margin-bottom: 10px;
-            padding: 10px;
+            margin-bottom: 20px;
+            padding: 12px;
             width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #007BFF;
+            border-radius: 10px;
             display: block;
             margin: 20px auto;
+            transition: border-color 0.3s;
+        }
+        #searchInput:hover {
+            border-color: #0056b3;
         }
         #exportBtn {
-            padding: 12px 24px;
+            padding: 15px 30px;
             background-color: #007BFF;
             color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             display: block;
             margin: 20px auto;
-            font-size: 16px;
+            font-size: 18px;
             transition: background-color 0.3s;
         }
         #exportBtn:hover {
             background-color: #0056b3;
         }
         #instructions {
-            margin-top: 30px;
+            margin-top: 40px;
             background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: 15px;
             border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
         }
         #instructions h2 {
             color: #007BFF;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         #menuContainer {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
         }
         #menuContainer button {
-            padding: 10px 15px;
+            padding: 15px 20px;
             background-color: #28a745;
             color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 16px;
         }
         #menuContainer button:hover {
             background-color: #218838;
+            transform: scale(1.05);
         }
         #menuContainer button.delete {
             background-color: #dc3545;
@@ -115,8 +155,35 @@
         #menuContainer button.delete:hover {
             background-color: #c82333;
         }
+        #menuContainer button.add-column {
+            background-color: #007BFF;
+        }
+        #menuContainer button.add-column:hover {
+            background-color: #0056b3;
+        }
+        #menuContainer button.remove-column {
+            background-color: #ffc107;
+        }
+        #menuContainer button.remove-column:hover {
+            background-color: #e0a800;
+        }
+        #menuContainer button.undo {
+            background-color: #6c757d;
+        }
+        #menuContainer button.undo:hover {
+            background-color: #5a6268;
+        }
+        #menuContainer button.redo {
+            background-color: #17a2b8;
+        }
+        #menuContainer button.redo:hover {
+            background-color: #138496;
+        }
         .selected {
             background-color: #d1ecf1 !important;
+        }
+        .highlight {
+            background-color: yellow;
         }
     </style>
     <!-- Bibliotecas -->
@@ -124,12 +191,19 @@
 </head>
 <body>
     <div id="container">
-        <h1><i class="fas fa-file-excel"></i> Aplicativo de Edição de Excel</h1>
-        <input type="file" id="fileInput" accept=".xlsx, .xls">
+        <h1><i class="fas fa-file-excel"></i> Aplicativo de Edição de Excel - Avançado</h1>
+        <div id="fileInputContainer">
+            <label id="fileInputLabel" for="fileInput"><i class="fas fa-upload"></i> Clique aqui para selecionar seu arquivo Excel</label>
+            <input type="file" id="fileInput" accept=".xlsx, .xls">
+        </div>
         <input type="text" id="searchInput" placeholder="Pesquisar...">
         <div id="menuContainer">
             <button onclick="addRow()"><i class="fas fa-plus-circle"></i> Adicionar Linha</button>
             <button class="delete" onclick="deleteRow()"><i class="fas fa-minus-circle"></i> Deletar Linha Selecionada</button>
+            <button class="add-column" onclick="addColumn()"><i class="fas fa-plus-circle"></i> Adicionar Coluna</button>
+            <button class="remove-column" onclick="removeColumn()"><i class="fas fa-minus-circle"></i> Remover Coluna</button>
+            <button class="undo" onclick="undoAction()"><i class="fas fa-undo"></i> Desfazer</button>
+            <button class="redo" onclick="redoAction()"><i class="fas fa-redo"></i> Refazer</button>
         </div>
         <div id="tableContainer"></div>
         <button id="exportBtn"><i class="fas fa-file-export"></i> Exportar para Excel</button>
@@ -139,8 +213,9 @@
                 <li>Faça upload de um arquivo Excel clicando no botão acima.</li>
                 <li>Edite os dados diretamente na tabela apresentada.</li>
                 <li>Use a barra de pesquisa para encontrar dados específicos.</li>
-                <li>Use o menu interativo para adicionar ou remover linhas.</li>
+                <li>Use o menu interativo para adicionar ou remover linhas e colunas.</li>
                 <li>Clique em "Exportar para Excel" para baixar os dados editados.</li>
+                <li>Use os botões "Desfazer" e "Refazer" para controlar suas alterações.</li>
             </ul>
         </div>
     </div>
@@ -150,6 +225,8 @@
         let originalData = [];
         let filteredData = [];
         let selectedRowIndex = -1;
+        let undoStack = [];
+        let redoStack = [];
         const fileInput = document.getElementById('fileInput');
         const tableContainer = document.getElementById('tableContainer');
         const searchInput = document.getElementById('searchInput');
@@ -201,13 +278,14 @@
         }
 
         function updateHeader(cell, colIndex) {
+            saveState();
             filteredData[0][colIndex] = cell.innerText;
         }
 
         function validateCell(cell, rowIndex, colIndex) {
+            saveState();
             if (rowIndex > 0 && cell.innerText.trim() === '' && originalData[rowIndex] && originalData[rowIndex][colIndex] !== undefined) {
-                alert('Este campo não pode estar vazio.');
-                cell.focus();
+                cell.innerText = originalData[rowIndex][colIndex];
             } else {
                 filteredData[rowIndex][colIndex] = cell.innerText;
             }
@@ -220,23 +298,77 @@
                 return row.some(cell => cell && cell.toString().toLowerCase().includes(query));
             });
             renderTable(filteredData);
+            highlightSearchTerm(query);
+        }
+
+        function highlightSearchTerm(term) {
+            if (!term) return;
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            rows.forEach(row => {
+                row.childNodes.forEach(cell => {
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    cell.innerHTML = cell.textContent.replace(regex, '<span class="highlight">$1</span>');
+                });
+            });
         }
 
         function exportTable() {
+            // Format the workbook to improve user experience in Excel
             const ws = XLSX.utils.aoa_to_sheet(filteredData);
+
+            // Set column widths to improve readability
+            const colWidths = filteredData[0].map(() => ({ wpx: 120 }));
+            ws['!cols'] = colWidths;
+
+            // Add styling information if necessary
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Dados Editados");
+
+            // Set workbook properties for better Excel compatibility
+            wb.Props = {
+                Title: "Dados Editados",
+                Subject: "Exportado do Aplicativo de Edição de Excel",
+                Author: "Aplicativo de Edição de Excel",
+                CreatedDate: new Date()
+            };
+
             XLSX.writeFile(wb, 'dados_editados.xlsx');
         }
 
         function addRow() {
+            saveState();
             const newRow = new Array(filteredData[0].length).fill('');
             filteredData.push(newRow);
             renderTable(filteredData);
         }
 
+        function addColumn() {
+            saveState();
+            filteredData.forEach((row, rowIndex) => {
+                if (rowIndex === 0) {
+                    row.push('Novo Cabeçalho');
+                } else {
+                    row.push('');
+                }
+            });
+            renderTable(filteredData);
+        }
+
+        function removeColumn() {
+            if (filteredData[0].length > 1) {
+                saveState();
+                filteredData.forEach(row => {
+                    row.pop();
+                });
+                renderTable(filteredData);
+            } else {
+                alert('Não é possível remover todas as colunas.');
+            }
+        }
+
         function deleteRow() {
             if (selectedRowIndex > 0) { // Não remover o cabeçalho
+                saveState();
                 filteredData.splice(selectedRowIndex, 1);
                 selectedRowIndex = -1;
                 renderTable(filteredData);
@@ -254,6 +386,27 @@
                     row.classList.add('selected');
                 }
             });
+        }
+
+        function saveState() {
+            undoStack.push(JSON.stringify(filteredData));
+            redoStack = [];
+        }
+
+        function undoAction() {
+            if (undoStack.length > 0) {
+                redoStack.push(JSON.stringify(filteredData));
+                filteredData = JSON.parse(undoStack.pop());
+                renderTable(filteredData);
+            }
+        }
+
+        function redoAction() {
+            if (redoStack.length > 0) {
+                undoStack.push(JSON.stringify(filteredData));
+                filteredData = JSON.parse(redoStack.pop());
+                renderTable(filteredData);
+            }
         }
     </script>
 </body>
