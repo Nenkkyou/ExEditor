@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplicativo de Edição de Excel</title>
+    <!-- Estilos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+        #fileInput {
+            margin-bottom: 20px;
+            display: block;
+            margin: 0 auto;
+        }
+        #tableContainer {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: #ffffff;
+            contenteditable: true;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #searchInput {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+        #exportBtn {
+            padding: 12px 24px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #exportBtn:hover {
+            background-color: #0056b3;
+        }
+        #instructions {
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        #instructions h2 {
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+        #menuContainer {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        #menuContainer button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        #menuContainer button:hover {
+            background-color: #218838;
+        }
+        #menuContainer button.delete {
+            background-color: #dc3545;
+        }
+        #menuContainer button.delete:hover {
+            background-color: #c82333;
+        }
+        .selected {
+            background-color: #d1ecf1 !important;
+        }
+    </style>
+    <!-- Bibliotecas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <h1><i class="fas fa-file-excel"></i> Aplicativo de Edição de Excel</h1>
+        <input type="file" id="fileInput" accept=".xlsx, .xls">
+        <input type="text" id="searchInput" placeholder="Pesquisar...">
+        <div id="menuContainer">
+            <button onclick="addRow()"><i class="fas fa-plus-circle"></i> Adicionar Linha</button>
+            <button class="delete" onclick="deleteRow()"><i class="fas fa-minus-circle"></i> Deletar Linha Selecionada</button>
+        </div>
+        <div id="tableContainer"></div>
+        <button id="exportBtn"><i class="fas fa-file-export"></i> Exportar para Excel</button>
+        <div id="instructions">
+            <h2>Instruções:</h2>
+            <ul>
+                <li>Faça upload de um arquivo Excel clicando no botão acima.</li>
+                <li>Edite os dados diretamente na tabela apresentada.</li>
+                <li>Use a barra de pesquisa para encontrar dados específicos.</li>
+                <li>Use o menu interativo para adicionar ou remover linhas.</li>
+                <li>Clique em "Exportar para Excel" para baixar os dados editados.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script>
+        let originalData = [];
+        let filteredData = [];
+        let selectedRowIndex = -1;
+        const fileInput = document.getElementById('fileInput');
+        const tableContainer = document.getElementById('tableContainer');
+        const searchInput = document.getElementById('searchInput');
+        const exportBtn = document.getElementById('exportBtn');
+
+        fileInput.addEventListener('change', handleFile);
+        searchInput.addEventListener('keyup', searchTable);
+        exportBtn.addEventListener('click', exportTable);
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                alert('Por favor, selecione um arquivo.');
+                return;
+            }
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                originalData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                filteredData = originalData.slice();
+                renderTable(filteredData);
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function renderTable(data) {
+            let tableHTML = '<table id="dataTable" onclick="selectRow(event)"><thead><tr>';
+            const headers = data[0];
+            headers.forEach((header, index) => {
+                tableHTML += `<th contenteditable="true" onblur="updateHeader(this, ${index})">${header}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            for (let i = 1; i < data.length; i++) {
+                tableHTML += '<tr>';
+                data[i].forEach((cell, index) => {
+                    tableHTML += `<td contenteditable="true" onblur="validateCell(this, ${i}, ${index})">${cell || ''}</td>`;
+                });
+                tableHTML += '</tr>';
+            }
+
+            tableHTML += '</tbody></table>';
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        function updateHeader(cell, colIndex) {
+            filteredData[0][colIndex] = cell.innerText;
+        }
+
+        function validateCell(cell, rowIndex, colIndex) {
+            if (rowIndex > 0 && cell.innerText.trim() === '' && originalData[rowIndex] && originalData[rowIndex][colIndex] !== undefined) {
+                alert('Este campo não pode estar vazio.');
+                cell.focus();
+            } else {
+                filteredData[rowIndex][colIndex] = cell.innerText;
+            }
+        }
+
+        function searchTable() {
+            const query = searchInput.value.toLowerCase();
+            filteredData = originalData.filter((row, index) => {
+                if (index === 0) return true; // headers
+                return row.some(cell => cell && cell.toString().toLowerCase().includes(query));
+            });
+            renderTable(filteredData);
+        }
+
+        function exportTable() {
+            const ws = XLSX.utils.aoa_to_sheet(filteredData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Dados Editados");
+            XLSX.writeFile(wb, 'dados_editados.xlsx');
+        }
+
+        function addRow() {
+            const newRow = new Array(filteredData[0].length).fill('');
+            filteredData.push(newRow);
+            renderTable(filteredData);
+        }
+
+        function deleteRow() {
+            if (selectedRowIndex > 0) { // Não remover o cabeçalho
+                filteredData.splice(selectedRowIndex, 1);
+                selectedRowIndex = -1;
+                renderTable(filteredData);
+            } else {
+                alert('Selecione uma linha válida para deletar.');
+            }
+        }
+
+        function selectRow(event) {
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            rows.forEach((row, index) => {
+                row.classList.remove('selected');
+                if (row === event.target.parentNode) {
+                    selectedRowIndex = index + 1; // Ajustar para ignorar cabeçalho
+                    row.classList.add('selected');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
